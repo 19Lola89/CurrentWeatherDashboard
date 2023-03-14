@@ -1,7 +1,7 @@
 // load the page when it is fully loaded
 $(document).ready(function () {
   const date = moment().format("llll");
-  console.log(date);
+  // console.log(date);
   let cities = JSON.parse(localStorage.getItem("cities")) || [];
   const queryURL = "https://api.openweathermap.org/data/2.5/forecast?q=";
   const key = "&appid=b1771496f45c74d965bd4b3150378e81";
@@ -12,7 +12,7 @@ $(document).ready(function () {
   let searchInput = $("#search-input");
   let responseResult;
 
-  function buttons(location) {
+  function buttons(value) {
     //empty the group of dynamic elements
     $(".list-group").empty();
     //loop through the
@@ -45,7 +45,6 @@ $(document).ready(function () {
       buttons(cityInput);
       // call the api
       callApi(cityInput);
-      buttons(cityInput);
     }
   });
   //AJAX call
@@ -59,8 +58,6 @@ $(document).ready(function () {
       method: "GET",
     }).then(function (response) {
       responseResult = response;
-
-      // responseResult = response;
 
       let icon = response.list[0].weather[0].icon;
 
@@ -79,7 +76,7 @@ $(document).ready(function () {
         "Temp: " + (response.list[0].main.temp - 273.15).toFixed(2) + "°C"
       );
 
-      let mph = $("<h3>").text("Wind: " + response.list[0].wind.speed + " MPH");
+      let mph = $("<h3>").text("Wind: " + response.list[0].wind.speed + " kmH");
 
       let humidity = $("<h3>").text(
         "Humidity " + response.list[0].main.humidity + " %"
@@ -87,7 +84,7 @@ $(document).ready(function () {
 
       $("#today").prepend(returnedCity);
       $("#today").append(currentTemp, mph, humidity);
-      futureForecast(responseResult);
+      futureForecast();
     });
   }
 
@@ -96,7 +93,7 @@ $(document).ready(function () {
   function futureForecast() {
     for (i = 1; i < responseResult.list.length; i++) {
       let listItem = responseResult.list[i].dt_txt
-        .slice(" ")
+        .split(" ")
         .includes("03:00:00");
       if (listItem) {
         resultArr.push(responseResult.list[i]);
@@ -137,7 +134,7 @@ $(document).ready(function () {
         `http://openweathermap.org/img/wn/${weatherIcon}@2x.png`
       );
       let temperature = $("<p>").text("Temperature: " + currTemp);
-      let windEl = $("<p>").text("Wind: " + speed + " MPH");
+      let windEl = $("<p>").text("Wind: " + speed + " kmH");
       let humiEl = $("<p>").text("Humidity: " + humi + "%");
       $(`#day${i}`).append(pic, temperature, windEl, humiEl);
     }
@@ -148,7 +145,8 @@ $(document).ready(function () {
   $(document).on("click", ".buttons", function (event) {
     event.preventDefault();
     let buttonContent = $(this).text();
-    console.log(buttonContent);
+
     callApi(buttonContent);
   });
+  // Disable the button
 });
