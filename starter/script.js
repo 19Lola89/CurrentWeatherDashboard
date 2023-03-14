@@ -6,16 +6,13 @@ $(document).ready(function () {
   const queryURL = "https://api.openweathermap.org/data/2.5/forecast?q=";
   const key = "&appid=b1771496f45c74d965bd4b3150378e81";
 
-  //  lat={lat}&lon={lon}
-
   // DOM tags
 
   let resultArr = [];
   let searchInput = $("#search-input");
-  let today = $("#today");
-  let forecast = $("#forecast");
+  let responseResult;
 
-  const buttons = (location) => {
+  function buttons(location) {
     //empty the group of dynamic elements
     $(".list-group").empty();
     //loop through the
@@ -28,9 +25,11 @@ $(document).ready(function () {
         .text(`${location}`);
       list.append(buttons);
     });
-  };
+  }
 
-  buttons();
+  buttons(searchInput);
+
+  // search button
 
   $("#search-button").on("click", function (e) {
     e.preventDefault();
@@ -46,13 +45,12 @@ $(document).ready(function () {
       buttons(cityInput);
       // call the api
       callApi(cityInput);
+      buttons(cityInput);
     }
   });
   //AJAX call
 
-  // retrieving
-
-  const callApi = (value) => {
+  function callApi(value) {
     $("#today").empty();
     $("#forecast").empty();
 
@@ -60,8 +58,9 @@ $(document).ready(function () {
       url: queryURL + value + key,
       method: "GET",
     }).then(function (response) {
-      // saving api object to a variable
-      // let weatherObj = response;
+      responseResult = response;
+
+      // responseResult = response;
 
       let icon = response.list[0].weather[0].icon;
 
@@ -88,17 +87,68 @@ $(document).ready(function () {
 
       $("#today").prepend(returnedCity);
       $("#today").append(currentTemp, mph, humidity);
-
-      // todays section
+      futureForecast(responseResult);
     });
-  };
+  }
+
   // 5 day forecast
+
+  function futureForecast() {
+    for (i = 1; i < responseResult.list.length; i++) {
+      let listItem = responseResult.list[i].dt_txt
+        .slice(" ")
+        .includes("03:00:00");
+      if (listItem) {
+        resultArr.push(responseResult.list[i]);
+      }
+    }
+    fiveDay();
+  }
+  // 5 day forecast function to create elements
+
+  function fiveDay() {
+    // dynamic elements for the forecast
+    let flexContainer = $("<div>").addClass("container");
+    let title = $("<h3>").attr("id", "title").addClass("future-weather");
+    title.text("Weather forecast for 5 days");
+    let cardDiv = $("<div>").addClass("flex");
+    flexContainer.append(cardDiv);
+    $("#forecast").append(title, flexContainer);
+
+    for (let i = 0; i < resultArr.length; i++) {
+      let forecastDay = $("<div>")
+        .attr("id", `day${i}`)
+        .addClass("col-sm card");
+      cardDiv.append(forecastDay);
+      let dates = moment()
+        .add(i + 1, "days")
+        .format("llll");
+      let p = $("<p>").text(dates);
+      $(`#day${i}`).prepend(p);
+
+      // dynamic elements for forecast
+      let tempFuture = resultArr[i].main.temp - 273.15;
+      let currTemp = tempFuture.toFixed(2) + "°C";
+      let weatherIcon = resultArr[i].weather[0].icon;
+      let speed = resultArr[i].wind.speed;
+      let humi = resultArr[i].main.humidity;
+      let pic = $("<img>").attr(
+        "src",
+        `http://openweathermap.org/img/wn/${weatherIcon}@2x.png`
+      );
+      let temperature = $("<p>").text("Temperature: " + currTemp);
+      let windEl = $("<p>").text("Wind: " + speed + " MPH");
+      let humiEl = $("<p>").text("Humidity: " + humi + "%");
+      $(`#day${i}`).append(pic, temperature, windEl, humiEl);
+    }
+  }
+
+  // rendering the page
+
+  $(document).on("click", ".buttons", function (event) {
+    event.preventDefault();
+    let buttonContent = $(this).text();
+    console.log(buttonContent);
+    callApi(buttonContent);
+  });
 });
-
-//--- 5 day forecast
-// date
-// icon
-// temperature
-// humidity
-
-// make a dropdown button functionality so that the city can be searched again.

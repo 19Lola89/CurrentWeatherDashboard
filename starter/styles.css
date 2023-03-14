@@ -1,0 +1,7 @@
+/* let today = $("#today");
+let forecast = $("#forecast"); */
+
+.flex {
+  display: flex;
+  gap: 10px;
+}
