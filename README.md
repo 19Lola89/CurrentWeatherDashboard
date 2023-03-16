@@ -24,7 +24,7 @@ MIT
 
 https://19lola89.github.io/CurrentWeatherDashboard/
 
-URL : 
+URL : https://19lola89.github.io/CurrentWeatherDashboard/
 
 
 
