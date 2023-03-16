@@ -27,5 +27,4 @@ https://19lola89.github.io/CurrentWeatherDashboard/
 URL : https://19lola89.github.io/CurrentWeatherDashboard/
 
 
-
-
+![weather](https://user-images.githubusercontent.com/86410482/225599351-f1771679-3b96-420a-83ee-a96e00f40cae.jpeg)
